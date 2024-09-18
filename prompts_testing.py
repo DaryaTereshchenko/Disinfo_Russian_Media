@@ -4,11 +4,14 @@ from tqdm import tqdm
 from utils import process_output, plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb
 import pandas as pd
 import wandb
-seed = 42 # Seed for replicability of results
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 WANDB_PROJECT_NAME = 'llm-classification'
 
+client = openai.OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="nokeyneeded",
+)
 
 def run_experiment(df: pd.DataFrame, system_prompt: str, user_prompt_format: str, 
                    experiment_name:str, dataset_name: str, model_name: str,
@@ -35,28 +38,27 @@ def run_experiment(df: pd.DataFrame, system_prompt: str, user_prompt_format: str
     
     # Evaluate ChatGPT on the dataset
     outputs = []
-    for text in tqdm(df.full_text):
-        # Get the evaluation from ChatGPT
-        chat_gpt_message_output = call_chat_completion_api(
-            client=client,
-            system_prompt=system_prompt, 
-            user_prompt=user_prompt_format.format(text=text),
-            force_json_output=False,
-            seed=seed,
-            model_name=model_name
-        )
+    response = client.chat.completions.create(
+        model="mistral-nemo:12b",
+        temperature=0.7,
+        max_tokens=256,
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant who is fluent in Russian."},
+            {"role": "user", "content": "Напиши мне что-нибудь по-русски."},
+        ],
+    )
         
         # Process the output
-        relevant, framing = process_output(subset_output_fun(chat_gpt_message_output))
+    relevant, framing = process_output(subset_output_fun(chat_gpt_message_output))
         
         # Add to the list
-        outputs.append(
-            {
-                "relevant": relevant, 
-                "frame": framing,
-                "full_output_chatgpt": chat_gpt_message_output
-            }
-        )
+    outputs.append(
+        {
+            "relevant": relevant, 
+            "frame": framing,
+            "full_output_chatgpt": chat_gpt_message_output
+        }
+    )
     
     # Join the outputs to the original dataframe
     outputs_df = pd.DataFrame(outputs, index=df.index)
