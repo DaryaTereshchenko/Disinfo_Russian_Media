@@ -28,8 +28,6 @@ def extract_label_with_regex(input_string: str, pattern: str, group_to_return: i
     
 extract_label = lambda x: extract_label_with_regex(x, pattern=r'"label"\s*:\s*w+', group_to_return=2)
 
-
-
 def process_output(llm_message_output: str) -> list | Any:
     try:
         output = json.loads(llm_message_output)
