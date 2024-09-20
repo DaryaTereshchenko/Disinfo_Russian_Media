@@ -4,13 +4,19 @@ from tqdm import tqdm
 from utils import process_output, plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb
 import pandas as pd
 import wandb
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+api_key = os.getenv('API_KEY')
+base_url = os.getenv('BASE_URL')
 WANDB_PROJECT_NAME = 'llm-classification'
 
 client = openai.OpenAI(
-    base_url="http://localhost:11434/v1",
-    api_key="nokeyneeded",
+    base_url=base_url,
+    api_key=api_key,
 )
 
 def run_experiment(df: pd.DataFrame, system_prompt: str, user_prompt_format: str, 
