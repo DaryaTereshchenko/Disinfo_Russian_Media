@@ -11,7 +11,6 @@ from sklearn.metrics import (accuracy_score, ConfusionMatrixDisplay, classificat
 import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.INFO, filename='inference.log', format='%(asctime)s - %(levelname)s - %(message)s')
-
 wandb.login()
 
 
