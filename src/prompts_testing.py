@@ -1,7 +1,7 @@
 import openai
 import logging
 from tqdm import tqdm
-from utils import process_output, plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb
+from src.utils import process_output, plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb
 import pandas as pd
 import wandb
 import os
