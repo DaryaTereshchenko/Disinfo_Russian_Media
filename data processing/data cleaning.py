@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import spacy
+from tqdm import tqdm
 
 # Load the spaCy Russian model
 nlp = spacy.load("ru_core_news_sm")
@@ -37,11 +38,19 @@ class DataProcessor:
         
         return text
     
-    def get_limited_token_data(self, max_tokens=7000):
+    def get_limited_token_data(self, max_tokens=8000):
+        # Enable the use of progress_apply with pandas
+        tqdm.pandas()
+        
         # Tokenize Russian text data using spaCy's ru_core_news_sm model
-        self.data["token_count"] = self.data["text"].apply(lambda x: len([token.text for token in nlp(x)]))
-        limited_data = self.data[self.data["token_count"] < max_tokens]
-        return limited_data.drop(columns=["token_count"])
+        def get_first_tokens(text, max_tokens):
+            tokens = [token.text for token in nlp(text)]
+            return ' '.join(tokens[:max_tokens])  # Get the first `max_tokens` tokens and join them back into text
+
+        # Apply the tokenization and store the first 8000 tokens in a new column 'limited_text'
+        self.data['limited_text'] = self.data['text'].progress_apply(lambda x: get_first_tokens(x, max_tokens))
+
+        return self.data
 
 if __name__ == "__main__":
     processor = DataProcessor(r".\\data\\euvsdisinfo_text.csv")
