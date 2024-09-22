@@ -67,10 +67,10 @@ class DataProcessor:
         return filtered_data
 
 if __name__ == "__main__":
-    file_path = os.path.join("data", "euvsdisinfo_text.csv")
+    file_path = os.path.join("./data", "euvsdisinfo_text.csv")
     processor = DataProcessor(file_path)
     processor.process_data()
     limited_data = processor.get_limited_token_data()
-    output_path = os.path.join("data", "cleaned_data.csv")
+    output_path = os.path.join("./data", "cleaned_data.csv")
     limited_data.to_csv(output_path, index=False)
 
