@@ -1,15 +1,18 @@
 import os 
 import pandas as pd
 import json
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 def read_csv(file_path: str) -> pd.DataFrame:
     """Reads a CSV file and returns a pandas DataFrame."""
     return pd.read_csv(file_path)
 
-def sample_data(df: pd.DataFrame, num_rows: int = 50, random_seed: int = 42) -> pd.DataFrame:
-    """Takes a random sample of data from a DataFrame."""
-    return df.sample(n=num_rows, random_state=random_seed)
+def sample_data(df: pd.DataFrame, num_samples: int = 25, random_seed: int = 42) -> pd.DataFrame:
+    """Takes a random sample of 25 instances from 'trustworthy' and 25 instances from 'disinformation'."""
+    trustworthy_sample = df[df['class'] == 'trustworthy'].sample(n=num_samples, random_state=random_seed)
+    disinformation_sample = df[df['class'] == 'disinformation'].sample(n=num_samples, random_state=random_seed)
+    
+    return pd.concat([trustworthy_sample, disinformation_sample]).sample(frac=1, random_state=random_seed).reset_index(drop=True)
 
 def select_columns(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
     """Selects specific columns from the DataFrame."""
@@ -25,6 +28,7 @@ def read_prompts_from_txt(file_path: str):
         # Split text based on user and system prompts
         content = file.read()
         system_prompt = content.split("system:")[-1].strip()
+        system_prompt = system_prompt.split("user:")[0].strip()
         user_prompt_format = content.split("user:")[-1].strip()
 
         return system_prompt, user_prompt_format
@@ -58,7 +62,7 @@ def process_data(file_path: str, output_csv_path: str, output_json_path: str, te
     selected_df = select_columns(sampled_df, ['article_id', 'class', 'limited_text'])
 
     # Read the prompts from the text file
-    zero_shot_prompts_path = os.path.join('.\prompts', 'zeroshot_ver_01_template.txt')
+    zero_shot_prompts_path = os.path.join('.\prompts\\templates', 'zeroshot_ver_01.txt')
     system_prompt_template, user_prompt_template = read_prompts_from_txt(zero_shot_prompts_path)
 
     # Save the selected data to CSV
@@ -73,8 +77,7 @@ def process_data(file_path: str, output_csv_path: str, output_json_path: str, te
 
 if __name__ == "__main__":
     file_path = os.path.join('.\data', 'cleaned_data.csv')
-    
     output_csv_path = os.path.join('.\data', 'sampled_data_zero_shot.csv')
+
     output_json_path = os.path.join('.\prompts\prompts_json', 'zero_shot.json')
-    
     process_data(file_path, output_csv_path, output_json_path, template_type="zero-shot")
