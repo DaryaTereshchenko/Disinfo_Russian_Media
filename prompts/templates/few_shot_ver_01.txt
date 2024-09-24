@@ -1,0 +1,18 @@
+user:
+You are assigned to classify a Russian text delimited by ``` into two categories: "disinformation" or "trustworthy."
+Disinformation is false or misleading information designed to deceive or manipulate people.
+
+Below are examples of text snippets classified as either "disinformation" or "trustworthy":
+
+Text: "Согласно новому исследованию, вакцина против гриппа вызывает рак."
+Label: disinformation
+
+Text: "Правительство выпустило новые данные по национальной статистике, подтверждающие рост экономики на 2%."
+Label: trustworthy
+
+Now, read the Russian text below and classify it as either "disinformation" or "not disinformation".
+
+TEXT:
+```
+{text}
+```

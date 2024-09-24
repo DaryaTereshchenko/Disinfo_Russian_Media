@@ -56,13 +56,12 @@ def save_to_json(json_data: List[Dict[str, str]], output_path: str) -> None:
         json.dump(json_data, json_file, ensure_ascii=False, indent=4)
 
 # Main function to handle the entire process
-def process_data(file_path: str, output_csv_path: str, output_json_path: str, template_type: str = "zero-shot") -> None:
+def process_data(file_path: str, zero_shot_prompts_path:str, output_csv_path: str, output_json_path: str, template_type: str = "zero-shot") -> None:
     df = read_csv(file_path)
     sampled_df = sample_data(df)
     selected_df = select_columns(sampled_df, ['article_id', 'class', 'limited_text'])
 
     # Read the prompts from the text file
-    zero_shot_prompts_path = os.path.join('.\prompts\\templates', 'zeroshot_ver_01.txt')
     system_prompt_template, user_prompt_template = read_prompts_from_txt(zero_shot_prompts_path)
 
     # Save the selected data to CSV
@@ -78,6 +77,6 @@ def process_data(file_path: str, output_csv_path: str, output_json_path: str, te
 if __name__ == "__main__":
     file_path = os.path.join('.\data', 'cleaned_data.csv')
     output_csv_path = os.path.join('.\data', 'sampled_data_zero_shot.csv')
-
+    zero_shot_prompts_path = os.path.join('.\prompts\\templates', 'zeroshot_ver_02.txt')
     output_json_path = os.path.join('.\prompts\prompts_json', 'zero_shot.json')
     process_data(file_path, output_csv_path, output_json_path, template_type="zero-shot")

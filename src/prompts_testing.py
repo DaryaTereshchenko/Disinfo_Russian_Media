@@ -20,7 +20,7 @@ client = openai.OpenAI(
     api_key=api_key,
 )
 
-def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str):
+def run_experiment_zero_shot(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str):
     # Start logging
     wandb.init(
         # set the wandb project where this run will be logged
@@ -59,27 +59,45 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
         response = client.chat.completions.create(
             model=model_name,
             temperature=0, # make the output deterministic
-            max_tokens=2, # make sure the model generates the expected output
+            max_tokens=4, # make sure the model generates the expected output
             messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": text}]
         )
         
         full_response = response.choices[0].message.content
         outputs.append(full_response)
+    
+    processed_outputs = {}
+    for i, output in enumerate(outputs, start=1):
+        if output == 'disinformation':
+            processed_outputs[f'output_{i}'] = output
+        elif output == 'trust' or 'trustworthy':
+            processed_outputs[f'output_{i}'] = 'trustworthy'
+        else:
+            processed_outputs[f'output_{i}'] = 'unidentified'
+    
+    # Add the outputs to the dataframe
+    outputs_df = pd.DataFrame(processed_outputs, index=df.index)
+    df = df.join(outputs_df, rsuffix='_pred')
+    print(df)
+    
 
-    # Log the outputs to wandb
-    outputs_artifact = wandb.Artifact('outputs', type='outputs')
     wandb.finish()
 
     return outputs
-        
+    
+def run_experiment_few_shot():
+    pass
+
+
+def run_experiment_cot():
+    pass
 if __name__ == '__main__':
     # Load the dataset
     data_path = os.path.join("./data", "sampled_data_zero_shot.csv")
     path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
 
     df = pd.read_csv(data_path)
-    result = run_experiment(df, 'zero-shot', 'sampled_data_zero_shot', "mistral-nemo:12b", path_prompts)
-    print(result)
+    result = run_experiment_zero_shot(df, 'zero-shot', 'sampled_data_zero_shot', "mistral-nemo:12b", path_prompts)
 
     # # Join the outputs to the original dataframe
     # outputs_df = pd.DataFrame(outputs, index=df.index)
