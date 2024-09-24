@@ -20,7 +20,7 @@ client = openai.OpenAI(
     api_key=api_key,
 )
 
-def run_experiment_zero_shot(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str):
+def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str, task_name:str) -> pd.DataFrame:
     # Start logging
     wandb.init(
         # set the wandb project where this run will be logged
@@ -66,67 +66,48 @@ def run_experiment_zero_shot(df: pd.DataFrame, experiment_name:str, dataset_name
         full_response = response.choices[0].message.content
         outputs.append(full_response)
     
-    processed_outputs = {}
-    for i, output in enumerate(outputs, start=1):
+    processed_outputs = []
+    for output in outputs:
         if output == 'disinformation':
-            processed_outputs[f'output_{i}'] = output
+            processed_outputs.append('disinformation')
         elif output == 'trust' or 'trustworthy':
-            processed_outputs[f'output_{i}'] = 'trustworthy'
+            processed_outputs.append('trustworthy')
         else:
-            processed_outputs[f'output_{i}'] = 'unidentified'
+            processed_outputs.append('unidentified')
     
     # Add the outputs to the dataframe
-    outputs_df = pd.DataFrame(processed_outputs, index=df.index)
-    df = df.join(outputs_df, rsuffix='_pred')
+    df[f"predicted_{task_name}"] = processed_outputs
     print(df)
     
+    # Log the dataset output to wandb
+    predictions_artifact = wandb.Artifact('predictions', type='outputs')
+    with predictions_artifact.new_file('predictions.csv', mode='w', encoding='utf-8') as f:
+        df.to_csv(f)
+    wandb.run.log_artifact(predictions_artifact)
 
+
+    # Measure performance 
+    try:    
+        y_true = df['class']
+        y_pred = df[f"predicted_{task_name}"]
+    
+        cm_plot, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred)
+        
+        log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='zero-shot')
+
+    except Exception as e:
+        print('Error computing metrics: ', e)
+
+    # Finish logging
     wandb.finish()
 
-    return outputs
+    return df
     
-def run_experiment_few_shot():
-    pass
-
-
-def run_experiment_cot():
-    pass
 if __name__ == '__main__':
     # Load the dataset
     data_path = os.path.join("./data", "sampled_data_zero_shot.csv")
     path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
 
     df = pd.read_csv(data_path)
-    result = run_experiment_zero_shot(df, 'zero-shot', 'sampled_data_zero_shot', "mistral-nemo:12b", path_prompts)
-
-    # # Join the outputs to the original dataframe
-    # outputs_df = pd.DataFrame(outputs, index=df.index)
-    # df = df.join(outputs_df, rsuffix='_pred')
-    
-    # # Log the dataset output to wandb
-    # predictions_artifact = wandb.Artifact('predictions', type='outputs')
-    # with predictions_artifact.new_file('predictions.csv', mode='w') as f:
-    #     df.to_csv(f)
-    # wandb.run.log_artifact(predictions_artifact)
-    
-    # # Measure performance 
-    # try:
-    #     # Relevance task
-    #     y_true_relevance = df['relevant'].map(int)
-    #     y_pred_relevance = outputs_df['relevant'].fillna(-1).map(int)
-    #     cm_plot, classification_report, metrics  =  plot_count_and_normalized_confusion_matrix(y_true=y_true_relevance, y_pred=y_pred_relevance, labels=[1, 0], display_labels=['Relevant', 'Irrelevant'], custom_display_labels=True)
-    #     log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='relevance')
-    
-    #     # Problem solution framing task
-    #     y_true_frame = df.loc[~df['frame'].isna(), 'frame'].map(
-    #         {'Neither': 0, 'Solution': 1, 'Problem': 2})
-    #     y_pred_frame = outputs_df.loc[~df['frame'].isna(), 'frame'].fillna(-1).map(int)
-    
-    #     cm_plot, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true_frame, y_pred=y_pred_frame, labels=[0, 1, 2, 3], display_labels=['Neither', 'Solution', 'Problem', 'Both'], custom_display_labels=True)
-    #     log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='framing')
-    #     wandb.finish()
-        
-    # except Exception as e:
-    #     print('Error computing metrics: ', e)
-    
-    # return df
+    models = ["mistral-nemo:12b", "gemma2:9b", "ollama run llama3.1:8b"]
+    result = run_experiment(df, 'zero-shot', 'sampled_data_zero_shot', "mistral-nemo:12b", path_prompts, 'zero_shot')
