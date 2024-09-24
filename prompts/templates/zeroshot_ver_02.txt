@@ -1,0 +1,18 @@
+system:
+You are a helpful assistant who is fluent in Russian and can classify text accurately.
+
+user:
+Your task is to classify Russian text as either "disinformation" or "not disinformation." Disinformation is false or misleading information designed to mislead or manipulate individuals or groups. Carefully read the text below, and based on this definition, classify it as one of the following:
+
+"disinformation"
+"trustworthy"
+
+OUTPUT ONLY THE LABEL
+DO NOT TRANSLATE. 
+DO NOT ADD EXTRA DATA.
+
+```
+{text}
+```
+
+

@@ -33,7 +33,7 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
         }
     )
     
-    # # Log prompts
+    # Log prompts
     prompts_artifact = wandb.Artifact('prompts', type='prompts')
 
     # Read json file and save the first prompt as system prompt
