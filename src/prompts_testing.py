@@ -74,33 +74,33 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
             processed_outputs.append('trustworthy')
         else:
             processed_outputs.append('unidentified')
-    print(len(df), len(processed_outputs))
-    # # Add the outputs to the dataframe
-    # df[f"predicted_{task_name}"] = processed_outputs
 
-    # print(df)
+    # Add the outputs to the dataframe
+    df[f"predicted_{task_name}"] = processed_outputs
+
+    print(df)
     
     # Log the dataset output to wandb
-    # predictions_artifact = wandb.Artifact('predictions', type='outputs')
-    # with predictions_artifact.new_file('predictions.csv', mode='w', encoding='utf-8') as f:
-    #     df.to_csv(f)
-    # wandb.run.log_artifact(predictions_artifact)
+    predictions_artifact = wandb.Artifact('predictions', type='outputs')
+    with predictions_artifact.new_file(f'predictions_{model_name}.csv', mode='w', encoding='utf-8') as f:
+        df.to_csv(f)
+    wandb.run.log_artifact(predictions_artifact)
 
 
-    # # Measure performance 
-    # try:    
-    #     y_true = df['class']
-    #     y_pred = df[f"predicted_{task_name}"]
+    # Measure performance 
+    try:    
+        y_true = df['class']
+        y_pred = df[f"predicted_{task_name}"]
     
-    #     cm_plot, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred)
+        cm_plot_path, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred, save_path="./img", figure_title=f'{task_name}_{model_name}')
         
-    #     log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='zero-shot')
+        log_metrics_and_confusion_matrices_wandb(cm_plot_path=cm_plot_path, classification_report=classification_report, metrics=metrics, task_name=f'{task_name}')
 
-    # except Exception as e:
-    #     print('Error computing metrics: ', e)
+    except Exception as e:
+        print('Error computing metrics: ', e)
 
-    # # Finish logging
-    # wandb.finish()
+    # Finish logging
+    wandb.finish()
 
     return df
     
@@ -110,5 +110,7 @@ if __name__ == '__main__':
     path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
 
     df = pd.read_csv(data_path)
-    models = ["mistral-nemo:12b", "gemma2:9b", "ollama run llama3.1:8b"]
-    result = run_experiment(df, 'zero-shot', 'sampled_data_zero_shot', "mistral-nemo:12b", path_prompts, 'zero_shot')
+    models = ["mistral-nemo:12b", "gemma2:9b", "llama3.1:8b"]
+    task_name = 'zero_shot'
+    for model in models:
+        result = run_experiment(df, f'{task_name}-{model}', 'sampled_data_zero_shot', model, path_prompts, task_name)

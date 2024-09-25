@@ -1,11 +1,11 @@
 from typing import Any
-import regex as re 
 import numpy as np
-import json
 import wandb
+import regex as re
 import logging
 import pandas as pd
 import pprint
+import os
 from sklearn.metrics import (accuracy_score, ConfusionMatrixDisplay, classification_report, recall_score,
                              precision_score, f1_score)
 import matplotlib.pyplot as plt
@@ -13,58 +13,13 @@ import matplotlib.pyplot as plt
 logging.basicConfig(level=logging.INFO, filename='inference.log', format='%(asctime)s - %(levelname)s - %(message)s')
 wandb.login()
 
-
-# def extract_label_with_regex(input_string: str, pattern: str, group_to_return: int) -> float | Any:
-#     # Use re.search to find the match
-#     match = re.search(pattern, input_string)
-
-#     if match:
-#         # Extract the value of "relevance" from the match
-#         value = str(match.group(group_to_return))
-#         return value
-#     else:
-#         return np.nan
-    
-# extract_label = lambda x: extract_label_with_regex(x, pattern=r'"label"\s*:\s*w+', group_to_return=2)
-
-# def process_output(llm_message_output: str) -> list | Any:
-#     try:
-#         output = json.loads(llm_message_output)
-#         get_label = 'label' if 'label' in output else None
-        
-#         output_classes = output[get_label] if get_label else np.nan
-
-#     except json.JSONDecodeError as e:
-#         print(f'Error parsing JSON: {e}')
-#         print(f'LLM Output: {llm_message_output}')
-#         output_classes = extract_label(llm_message_output)
-    
-#     except KeyError as e:
-#         print(f'JSON does not contain the "label" in keys: {e}')
-#         print(f'JSON: {output}')
-#         output_classes = np.nan
-        
-#     except ValueError as e:
-#         print(f'Output classes could not be parsed as strings: {e}')
-#         print(f'label: {output["label"]}')
-        
-#         output_classes = output['label']
-    
-#     except Exception as e:
-#         print(f'Unknown error: {e}')
-#         print(f'ChatGPT output: {llm_message_output}')
-#         output_classes = np.nan
-
-#     return output_classes
-
-def log_metrics_and_confusion_matrices_wandb(cm_plot, classification_report, metrics, task_name: str):
+def log_metrics_and_confusion_matrices_wandb(cm_plot_path, classification_report, metrics, task_name: str):
     # Log metrics
     for metric_name, metric_value in metrics.items():
         wandb.log({f'{metric_name}_{task_name}': metric_value})
 
     # Log the confusion matrix matplotlib figure
-    wandb.log({f'confusion_matrix [{task_name}]': wandb.Image(cm_plot)})
-    
+    wandb.log({f'confusion_matrix_{task_name}': wandb.Image(cm_plot_path)})
     # Log the classification report as an artifact
     classification_report = (pd.DataFrame({k: v for k, v in classification_report.items() if k != 'accuracy'})
                              .transpose().reset_index())
@@ -87,8 +42,9 @@ default_metrics = {
     'f1': lambda y_t, y_p: f1_score(y_t, y_p, zero_division=np.nan, average='micro')
 }
 
+
 def plot_count_and_normalized_confusion_matrix(y_true, y_pred, xticks_rotation='horizontal',
-                                               metrics: dict = default_metrics, custom_display_labels: bool = False):
+                                               metrics: dict = default_metrics, save_path=None,  figure_title=None):
     # Print classification report
     cls_report = classification_report(y_true, y_pred, output_dict=True)
     pprint.pprint(cls_report)
@@ -96,26 +52,40 @@ def plot_count_and_normalized_confusion_matrix(y_true, y_pred, xticks_rotation='
     # Create plot with two subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
 
-    # Remove labels and display_labels not present in y_true
-    # if not custom_display_labels:
-    #     display_labels = [label for label in display_labels if label in y_true.unique()]
-    #     labels = [label for label in labels if label in y_true.unique()]
-
     # Plot count confusion matrix
-    cm_disp = ConfusionMatrixDisplay.from_predictions(y_true, y_pred)
-    cm_disp.plot(ax=ax1, xticks_rotation=xticks_rotation)
+    cm_disp = ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=ax1)
     ax1.set_title('Count Confusion Matrix')
+    ax1.set_xticklabels(ax1.get_xticklabels(), rotation=xticks_rotation)
 
     # Plot normalized confusion matrix
-    cm_disp = ConfusionMatrixDisplay.from_predictions(y_true, y_pred, normalize='true')
-    cm_disp.plot(ax=ax2, xticks_rotation=xticks_rotation)
+    cm_disp = ConfusionMatrixDisplay.from_predictions(y_true, y_pred, normalize='true', ax=ax2)
     ax2.set_title('Normalized Confusion Matrix')
+    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=xticks_rotation)
+    
+    if figure_title:
+        fig.suptitle(figure_title, fontsize=16)
+        # Create a valid filename from the figure title
+        sanitized_title = re.sub(r'[^a-zA-Z0-9]', '_', figure_title)
+        save_filename = f'confusion_matrix_{sanitized_title}.png'
+    else:
+        save_filename = 'confusion_matrix.png'
+    
+    # Save plot if a save path is provided
+    if save_path:
+        print(f"Saving confusion matrix to {save_path}")
+        full_save_path = os.path.join(save_path, save_filename)
+        plt.savefig(full_save_path)  # Save the figure
+        print(f"Confusion matrix saved to {full_save_path}")
+    else:
+        os.makedirs("./img", exist_ok=True)
+        full_save_path = os.path.join("./img", save_filename)
+        plt.savefig(full_save_path)
 
-    # Show plot
-    plt.show()
-    plt.close()
+    # # Show plot
+    # plt.show()
+    # plt.close()
 
     # Calculate metrics
     metrics = {metric_name: metric_func(y_true, y_pred) for metric_name, metric_func in metrics.items()}
 
-    return fig, cls_report, metrics
+    return full_save_path, cls_report, metrics
