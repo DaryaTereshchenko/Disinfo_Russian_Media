@@ -74,32 +74,33 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
             processed_outputs.append('trustworthy')
         else:
             processed_outputs.append('unidentified')
-    
-    # Add the outputs to the dataframe
-    df[f"predicted_{task_name}"] = processed_outputs
-    print(df)
+    print(len(df), len(processed_outputs))
+    # # Add the outputs to the dataframe
+    # df[f"predicted_{task_name}"] = processed_outputs
+
+    # print(df)
     
     # Log the dataset output to wandb
-    predictions_artifact = wandb.Artifact('predictions', type='outputs')
-    with predictions_artifact.new_file('predictions.csv', mode='w', encoding='utf-8') as f:
-        df.to_csv(f)
-    wandb.run.log_artifact(predictions_artifact)
+    # predictions_artifact = wandb.Artifact('predictions', type='outputs')
+    # with predictions_artifact.new_file('predictions.csv', mode='w', encoding='utf-8') as f:
+    #     df.to_csv(f)
+    # wandb.run.log_artifact(predictions_artifact)
 
 
-    # Measure performance 
-    try:    
-        y_true = df['class']
-        y_pred = df[f"predicted_{task_name}"]
+    # # Measure performance 
+    # try:    
+    #     y_true = df['class']
+    #     y_pred = df[f"predicted_{task_name}"]
     
-        cm_plot, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred)
+    #     cm_plot, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred)
         
-        log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='zero-shot')
+    #     log_metrics_and_confusion_matrices_wandb(cm_plot=cm_plot, classification_report=classification_report, metrics=metrics, task_name='zero-shot')
 
-    except Exception as e:
-        print('Error computing metrics: ', e)
+    # except Exception as e:
+    #     print('Error computing metrics: ', e)
 
-    # Finish logging
-    wandb.finish()
+    # # Finish logging
+    # wandb.finish()
 
     return df
     
