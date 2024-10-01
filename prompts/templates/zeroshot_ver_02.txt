@@ -7,9 +7,8 @@ Your task is to classify Russian text as either "disinformation" or "not disinfo
 "disinformation"
 "trustworthy"
 
-OUTPUT ONLY THE LABEL
 DO NOT TRANSLATE. 
-DO NOT ADD EXTRA DATA.
+DO NOT ADD EXPLANATION.
 
 ```
 {text}

@@ -92,7 +92,7 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
         y_true = df['class']
         y_pred = df[f"predicted_{task_name}"]
     
-        cm_plot_path, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred, save_path="./img", figure_title=f'{task_name}_{model_name}')
+        cm_plot_path, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred, save_path="../img", figure_title=f'{task_name}_{model_name}')
         
         log_metrics_and_confusion_matrices_wandb(cm_plot_path=cm_plot_path, classification_report=classification_report, metrics=metrics, task_name=f'{task_name}')
 
@@ -106,11 +106,11 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
     
 if __name__ == '__main__':
     # Load the dataset
-    data_path = os.path.join("./data", "sampled_data_zero_shot.csv")
-    path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
+    data_path = os.path.join("../data", "few_shot_ver_01.csv")
+    path_prompts = os.path.join("../prompts/prompts_json", "few_shot_ver_01.json")
 
     df = pd.read_csv(data_path)
     models = ["mistral-nemo:12b", "gemma2:9b", "llama3.1:8b"]
-    task_name = 'zero_shot'
+    task_name = 'few_shot'
     for model in models:
-        result = run_experiment(df, f'{task_name}-{model}', 'sampled_data_zero_shot', model, path_prompts, task_name)
+        result = run_experiment(df, f'{task_name}-{model}', 'few_shot_first_version', model, path_prompts, task_name)

@@ -10,13 +10,13 @@ Common forms of disinformation include:
 - Manipulating the actions, thoughts, or beliefs of individuals or groups;
 - Influencing public opinion or behavior about specific issues, events, or entities.
 
-Carefully read the Russian text provided below and classify it as one of the following:
+Carefully read the Russian text delimited by ``` and classify it as one of the following:
 
-"disinformation" if it contains any characteristics of disinformation.
-"trustworthy" if it does not contain any signs of disinformation.
+"disinformation"
+"trustworthy"
 
-**Respond only with one of the two labels: "disinformation" or "not disinformation."**
-**Do not include any additional explanations, text, or commentary.**
+**USE ONLY "disinformation" | "trustworthy"**
+**DO NOT EXPLAIN YOUR ANSWER**
 
 ```
 {text}

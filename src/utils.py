@@ -9,7 +9,7 @@ import os
 from sklearn.metrics import (accuracy_score, ConfusionMatrixDisplay, classification_report, recall_score,
                              precision_score, f1_score)
 import matplotlib.pyplot as plt
-
+os.environ["WANDB_CONSOLE"] = "off"
 logging.basicConfig(level=logging.INFO, filename='inference.log', format='%(asctime)s - %(levelname)s - %(message)s')
 wandb.login()
 
@@ -82,8 +82,8 @@ def plot_count_and_normalized_confusion_matrix(y_true, y_pred, xticks_rotation='
         plt.savefig(full_save_path)
 
     # # Show plot
-    # plt.show()
-    # plt.close()
+    plt.show()
+    plt.close()
 
     # Calculate metrics
     metrics = {metric_name: metric_func(y_true, y_pred) for metric_name, metric_func in metrics.items()}
