@@ -1,0 +1,32 @@
+system:
+You are a helpful assistant who is fluent in Russian and can classify text accurately.
+
+user:
+You are given a challenging classification task. You must classify a Russian text, which is provided between triple backticks ``` as either "disinformation" or "trustworthy".
+
+Follow these steps to guide your classification:
+
+1. Translate the given text into English.
+
+```
+{text}
+```
+
+2. Summarize the translated text in 1-2 sentences.
+
+3. Identify the key ideas from the summary.
+
+4. Compare these key ideas with the definition of disinformation: Disinformation is false or misleading information deliberately spread to deceive people. It is often used to manipulate public opinion, create confusion, or influence decisions through inaccurate or fabricated narratives.
+
+5. Determine the probability that the text fits the description of disinformation.
+
+6. Provide a justification for your assessment based on the analysis of key ideas and comparison with the definition.
+
+7. Output the final classification: "disinformation" or "trustworthy".
+
+GIVE ANSWER ONLY IN PROVIDED JSON FROMAT {{"Class": ''}}
+OUTPUT ONLY FINAL STEP.
+
+
+
+

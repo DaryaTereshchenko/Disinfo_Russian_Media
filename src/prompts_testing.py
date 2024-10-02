@@ -7,6 +7,7 @@ import wandb
 import os
 import json
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -19,6 +20,16 @@ client = openai.OpenAI(
     base_url=base_url,
     api_key=api_key,
 )
+
+def process_output(input_text: str) -> str:
+    matches = re.findall(r"\b(disinformation|trustworthy|dis|trust|Dis|Trust|Disinformation|Trustworthy)\b", input_text)
+    if matches:
+        matched = matches[0]
+        if matched.lower() == 'disinformation' or matched.lower() == 'dis':
+            return 'disinformation'
+        if matched.lower() == 'trustworthy' or matched.lower() == 'trust':
+            return 'trustworthy'
+    return 'undefined'
 
 def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str, task_name:str) -> pd.DataFrame:
     # Start logging
@@ -59,27 +70,21 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
         response = client.chat.completions.create(
             model=model_name,
             temperature=0, # make the output deterministic
-            max_tokens=4, # make sure the model generates the expected output
+            max_tokens=10, # make sure the model generates the expected output
             messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": text}]
         )
         
         full_response = response.choices[0].message.content
         outputs.append(full_response)
-    
+
     processed_outputs = []
     for output in outputs:
-        if output == 'disinformation':
-            processed_outputs.append('disinformation')
-        elif output == 'trust' or 'trustworthy':
-            processed_outputs.append('trustworthy')
-        else:
-            processed_outputs.append('unidentified')
-
+        print(f"Initial output: {output}")  
+        processed_outputs.append(process_output(output))
+        
     # Add the outputs to the dataframe
     df[f"predicted_{task_name}"] = processed_outputs
 
-    print(df)
-    
     # Log the dataset output to wandb
     predictions_artifact = wandb.Artifact('predictions', type='outputs')
     with predictions_artifact.new_file(f'predictions_{model_name}.csv', mode='w', encoding='utf-8') as f:
@@ -92,7 +97,7 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
         y_true = df['class']
         y_pred = df[f"predicted_{task_name}"]
     
-        cm_plot_path, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred, save_path="../img", figure_title=f'{task_name}_{model_name}')
+        cm_plot_path, classification_report, metrics = plot_count_and_normalized_confusion_matrix(y_true=y_true, y_pred=y_pred, save_path="./img", figure_title=f'{task_name}_{model_name}')
         
         log_metrics_and_confusion_matrices_wandb(cm_plot_path=cm_plot_path, classification_report=classification_report, metrics=metrics, task_name=f'{task_name}')
 
@@ -106,11 +111,11 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
     
 if __name__ == '__main__':
     # Load the dataset
-    data_path = os.path.join("../data", "few_shot_ver_01.csv")
-    path_prompts = os.path.join("../prompts/prompts_json", "few_shot_ver_01.json")
+    data_path = os.path.join("./data", "zero_shot.csv")
+    path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
 
     df = pd.read_csv(data_path)
     models = ["mistral-nemo:12b", "gemma2:9b", "llama3.1:8b"]
-    task_name = 'few_shot'
+    task_name = 'zero_shot_classification'
     for model in models:
-        result = run_experiment(df, f'{task_name}-{model}', 'few_shot_first_version', model, path_prompts, task_name)
+        result = run_experiment(df, f'{task_name}-{model}', 'zero_shot_classification', model, path_prompts, task_name)

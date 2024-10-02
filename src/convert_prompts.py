@@ -8,7 +8,7 @@ def read_csv(file_path: str) -> pd.DataFrame:
     """Reads a CSV file and returns a pandas DataFrame."""
     return pd.read_csv(file_path)
 
-def sample_data(df: pd.DataFrame, num_samples: int = 25, random_seed: int = 22) -> pd.DataFrame:
+def sample_data(df: pd.DataFrame, num_samples: int = 25, random_seed: int = 32) -> pd.DataFrame:
     """Takes a random sample of 25 instances from 'trustworthy' and 25 instances from 'disinformation'."""
     trustworthy_sample = df[df['class'] == 'trustworthy'].sample(n=num_samples, random_state=random_seed)
     disinformation_sample = df[df['class'] == 'disinformation'].sample(n=num_samples, random_state=random_seed)
