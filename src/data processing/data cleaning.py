@@ -43,17 +43,17 @@ class DataProcessor:
             return ""
         
         return text
-    
+
+
     def get_limited_token_data(self, max_tokens=8000):
         # Enable the use of progress_apply with pandas
         tqdm.pandas()
         
-
         # Tokenize Russian text data using spaCy's ru_core_news_sm model
         def get_first_tokens(text, max_tokens):
             tokens = [token.text for token in nlp(text)]
             return ' '.join(tokens[:max_tokens])  # Get the first `max_tokens` tokens and join them back into text
-
+        
         # Apply the tokenization and store the first 8000 tokens in a new column 'limited_text'
         self.data['limited_text'] = self.data['text'].progress_apply(lambda x: get_first_tokens(x, max_tokens))
 

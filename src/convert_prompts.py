@@ -8,7 +8,7 @@ def read_csv(file_path: str) -> pd.DataFrame:
     """Reads a CSV file and returns a pandas DataFrame."""
     return pd.read_csv(file_path)
 
-def sample_data(df: pd.DataFrame, num_samples: int = 25, random_seed: int = 32) -> pd.DataFrame:
+def sample_data(df: pd.DataFrame, num_samples: int = 300, random_seed: int = 32) -> pd.DataFrame:
     """Takes a random sample of 25 instances from 'trustworthy' and 25 instances from 'disinformation'."""
     trustworthy_sample = df[df['class'] == 'trustworthy'].sample(n=num_samples, random_state=random_seed)
     disinformation_sample = df[df['class'] == 'disinformation'].sample(n=num_samples, random_state=random_seed)
@@ -76,11 +76,11 @@ if __name__ == "__main__":
         sys.exit(1)
 
     file_path = sys.argv[1]
-    zero_shot_prompts_path = sys.argv[2]
+    prompts_path = sys.argv[2]
     # Get the base file name
-    base_file_name = os.path.basename(zero_shot_prompts_path).split('.')[0]
+    base_file_name = os.path.basename(prompts_path).split('.')[0]
 
 
     output_csv_path = os.path.join('../data', f'{base_file_name}.csv')
     output_json_path = os.path.join('../prompts/prompts_json', f'{base_file_name}.json')
-    process_data(file_path, zero_shot_prompts_path, output_csv_path, output_json_path=output_json_path)
+    process_data(file_path, prompts_path, output_csv_path, output_json_path=output_json_path)
