@@ -2,7 +2,7 @@ system:
 You are a helpful assistant who is fluent in Russian and can classify text accurately.
 
 user:
-Your task is to classify Russian text as either "disinformation" or "not disinformation." 
+Your task is to classify Russian text as either "disinformation" or "trustworthy" 
 Disinformation is false or misleading information deliberately spread to deceive people. It is often used to manipulate public opinion, create confusion, or influence decisions through inaccurate or fabricated narratives.
 
 ```
@@ -10,5 +10,8 @@ Disinformation is false or misleading information deliberately spread to deceive
 ```
 GIVE ANSWER ONLY IN PROVIDED JSON FROMAT {{"Class": 'disinformation' | 'trustworthy'}}
 DO NOT ADD EXPLANATION.
+
+assistant:
+"Class": {label}
 
 
