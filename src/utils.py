@@ -11,7 +11,7 @@ from sklearn.metrics import (accuracy_score, ConfusionMatrixDisplay, classificat
 import matplotlib.pyplot as plt
 os.environ["WANDB_CONSOLE"] = "off"
 logging.basicConfig(level=logging.INFO, filename='inference.log', format='%(asctime)s - %(levelname)s - %(message)s')
-wandb.login()
+# wandb.login()
 
 def log_metrics_and_confusion_matrices_wandb(cm_plot_path, classification_report, metrics, task_name: str):
     # Log metrics
@@ -89,3 +89,13 @@ def plot_count_and_normalized_confusion_matrix(y_true, y_pred, xticks_rotation='
     metrics = {metric_name: metric_func(y_true, y_pred) for metric_name, metric_func in metrics.items()}
 
     return full_save_path, cls_report, metrics
+
+def process_output(input_text: str) -> str:
+    matches = re.findall(r"\b(disinformation|trustworthy|dis|trust|Dis|Trust|Disinformation|Trustworthy)\b", input_text)
+    if matches:
+        matched = matches[0]
+        if matched.lower() == 'disinformation' or matched.lower() == 'dis':
+            return 'disinformation'
+        if matched.lower() == 'trustworthy' or matched.lower() == 'trust':
+            return 'trustworthy'
+    return 'undefined'

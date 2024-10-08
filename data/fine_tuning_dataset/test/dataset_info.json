@@ -6,7 +6,7 @@
   "dataset_size": 10366010,
   "description": "",
   "download_checksums": {
-    "/home/dariast/Disinfo_Russian_Media/src/../data/fine_tuning_subset.csv": {
+    "/home/dariast/Disinfo_Russian_Media/./data/fine_tuning_subset.csv": {
       "num_bytes": 10367830,
       "checksum": null
     }

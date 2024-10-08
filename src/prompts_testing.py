@@ -1,7 +1,7 @@
 import openai
 import logging
 from tqdm import tqdm
-from utils import plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb
+from utils import plot_count_and_normalized_confusion_matrix, log_metrics_and_confusion_matrices_wandb, process_output
 import pandas as pd
 import wandb
 import os
@@ -21,15 +21,6 @@ client = openai.OpenAI(
     api_key=api_key,
 )
 
-def process_output(input_text: str) -> str:
-    matches = re.findall(r"\b(disinformation|trustworthy|dis|trust|Dis|Trust|Disinformation|Trustworthy)\b", input_text)
-    if matches:
-        matched = matches[0]
-        if matched.lower() == 'disinformation' or matched.lower() == 'dis':
-            return 'disinformation'
-        if matched.lower() == 'trustworthy' or matched.lower() == 'trust':
-            return 'trustworthy'
-    return 'undefined'
 
 def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, model_name: str, prompts: str, task_name:str) -> pd.DataFrame:
     # Start logging
@@ -111,7 +102,7 @@ def run_experiment(df: pd.DataFrame, experiment_name:str, dataset_name: str, mod
     
 if __name__ == '__main__':
     # Load the dataset
-    data_path = os.path.join("./data", "zero_shot.csv")
+    data_path = os.path.join("../data", "zero_shot.csv")
     path_prompts = os.path.join("./prompts/prompts_json", "zero_shot.json")
 
     df = pd.read_csv(data_path)

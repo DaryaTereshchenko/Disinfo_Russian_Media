@@ -1,6 +1,6 @@
 import pandas as pd
 import os 
-from src.convert_prompts import read_csv, sample_data, select_columns, save_to_csv, save_to_json, read_prompts_from_txt
+from convert_prompts import read_csv, sample_data, select_columns, save_to_csv, save_to_json, read_prompts_from_txt
 from typing import List, Dict
 from datasets import load_dataset
 from unsloth import FastLanguageModel
@@ -28,16 +28,20 @@ def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: s
     save_to_csv(new_df, os.path.join(output_csv_path, csv_name))
 
 # Template for fine-tuning
-gpt = """{SYSTEM}
-USER: {INPUT}
-ASSISTANT: {OUTPUT}"""
+chat_template = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+{SYSTEM}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+{INPUT}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+{OUTPUT}<|eot_id|>"""
 
 max_seq_length = 2048 # Choose any! We auto support RoPE Scaling internally!
 dtype = None # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
 load_in_4bit = True # Use 4bit quantization to reduce memory usage. Can be False.
 
 _, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "unsloth/Meta-Llama-3.1-8B",
+    model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
     max_seq_length = max_seq_length,
     dtype = dtype,
     load_in_4bit = load_in_4bit
@@ -57,7 +61,7 @@ def formatting_prompts_func(examples):
             continue
 
         # Must add EOS_TOKEN, otherwise your generation will go on forever!
-        text = gpt.format(SYSTEM=instruction, INPUT=input_text, OUTPUT=output) + EOS_TOKEN
+        text = chat_template.format(SYSTEM=instruction, INPUT=input_text, OUTPUT=output)
         texts.append(text)
     return {"text": texts}
 
@@ -84,5 +88,5 @@ def main(path_to_csv: str, output_path: str):
     combined_dataset.save_to_disk(output_path)
 
 if __name__ == "__main__":
-    create_training_dataset('../data/zero_shot_fine_tuning.csv', '../prompts/prompts_json', '../prompts/templates/zero_shot_fine_tuning.txt')
-    main('../data/fine_tuning_subset.csv', '../data/fine_tuning_dataset')
+    create_training_dataset('./data/zero_shot_fine_tuning.csv', './prompts/prompts_json', './prompts/templates/zero_shot_fine_tuning.txt')
+    main('./data/fine_tuning_subset.csv', './data/fine_tuning_dataset')
