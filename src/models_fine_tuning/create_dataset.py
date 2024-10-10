@@ -88,5 +88,5 @@ def main(path_to_csv: str, output_path: str):
     combined_dataset.save_to_disk(output_path)
 
 if __name__ == "__main__":
-    create_training_dataset('./data/zero_shot_fine_tuning.csv', './prompts/prompts_json', './prompts/templates/zero_shot_fine_tuning.txt')
+    # create_training_dataset('./data/zero_shot_fine_tuning.csv', './prompts/prompts_json', './prompts/templates/zero_shot_fine_tuning.txt')
     main('./data/fine_tuning_subset.csv', './data/fine_tuning_dataset')
