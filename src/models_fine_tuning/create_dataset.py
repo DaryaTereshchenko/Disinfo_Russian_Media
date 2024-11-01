@@ -35,9 +35,9 @@ chat_template = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
 {OUTPUT}<|eot_id|>"""
 
-max_seq_length = 2048 # Choose any! We auto support RoPE Scaling internally!
-dtype = None # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
-load_in_4bit = True # Use 4bit quantization to reduce memory usage. Can be False.
+max_seq_length = 2048
+dtype = None
+load_in_4bit = True
 
 _, tokenizer = FastLanguageModel.from_pretrained(
     model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
@@ -85,7 +85,7 @@ def main(path_to_csv: str, output_path: str):
 
     # Save the combined dataset to disk
     combined_dataset.save_to_disk(output_path)
-    
+
 
 if __name__ == "__main__":
     # create_training_dataset('./data/few_shot.csv', './data', './prompts/templates/few_shot.txt', 'fewshot_fine_tuning')
