@@ -30,3 +30,6 @@ Class: disinformation
 ```
 
 GIVE ANSWER ONLY IN PROVIDED JSON FROMAT {{"Class": 'disinformation' | 'trustworthy'}}
+
+assistant:
+"Class": {label}

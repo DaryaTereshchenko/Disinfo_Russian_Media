@@ -1,0 +1,50 @@
+{
+  "builder_name": "csv",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "csv",
+  "dataset_size": 1821410,
+  "description": "",
+  "download_checksums": {
+    "/home/dariast/Disinfo_Russian_Media/./data/fewshot_fine_tuning.csv": {
+      "num_bytes": 1822580,
+      "checksum": null
+    }
+  },
+  "download_size": 1822580,
+  "features": {
+    "SYSTEM": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "INPUT": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "OUTPUT": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 3643990,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 1821410,
+      "num_examples": 50,
+      "dataset_name": "csv"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

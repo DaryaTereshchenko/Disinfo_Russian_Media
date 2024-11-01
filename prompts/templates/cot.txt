@@ -27,6 +27,7 @@ OUTPUT ONLY FINAL STEP.
 {text}
 ```
 
-
+assistant:
+"Class": {label}
 
 

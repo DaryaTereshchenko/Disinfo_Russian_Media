@@ -85,7 +85,8 @@ def main(path_to_csv: str, output_path: str):
 
     # Save the combined dataset to disk
     combined_dataset.save_to_disk(output_path)
+    
 
 if __name__ == "__main__":
-    create_training_dataset('./data/cot.csv', './data', './prompts/templates/cot.txt', 'cot_fine_tuning')
-    # main('./data/fine_tuning_subset.csv', './data/fine_tuning_dataset')
+    # create_training_dataset('./data/few_shot.csv', './data', './prompts/templates/few_shot.txt', 'fewshot_fine_tuning')
+    main('./data/fewshot_fine_tuning.csv', './data/fewshot_dataset')
