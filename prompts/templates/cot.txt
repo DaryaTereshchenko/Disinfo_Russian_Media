@@ -8,10 +8,6 @@ Follow these steps to guide your classification:
 
 1. Translate the given text into English.
 
-```
-{text}
-```
-
 2. Summarize the translated text in 1-2 sentences.
 
 3. Identify the key ideas from the summary.
@@ -26,6 +22,10 @@ Follow these steps to guide your classification:
 
 GIVE ANSWER ONLY IN PROVIDED JSON FROMAT {{"Class": ''}}
 OUTPUT ONLY FINAL STEP.
+
+```
+{text}
+```
 
 
 

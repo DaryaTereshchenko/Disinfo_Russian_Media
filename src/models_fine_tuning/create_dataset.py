@@ -1,11 +1,11 @@
 import pandas as pd
 import os 
-from convert_prompts import read_csv, select_columns, save_to_csv, read_prompts_from_txt
+from src.convert_prompts import read_csv, select_columns, save_to_csv, read_prompts_from_txt
 from datasets import load_dataset
 from unsloth import FastLanguageModel
 from datasets import DatasetDict
 
-def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: str) -> None:
+def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: str, file_name: str) -> None:
     df = read_csv(file_path)
     selected_df = select_columns(df, ['class', 'text'])
     
@@ -23,7 +23,7 @@ def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: s
         assistant_prompts.append(assistant_prompt.format(label=label))
     # Create a new DataFrame with the prompts
     new_df = pd.DataFrame({'SYSTEM': system_prompts, 'INPUT': user_prompts, 'OUTPUT': assistant_prompts})
-    csv_name = "fine_tuning_subset.csv"
+    csv_name = f"{file_name}.csv"
     save_to_csv(new_df, os.path.join(output_csv_path, csv_name))
 
 # Template for fine-tuning
@@ -87,5 +87,5 @@ def main(path_to_csv: str, output_path: str):
     combined_dataset.save_to_disk(output_path)
 
 if __name__ == "__main__":
-    # create_training_dataset('./data/zero_shot_fine_tuning.csv', './prompts/prompts_json', './prompts/templates/zero_shot_fine_tuning.txt')
-    main('./data/fine_tuning_subset.csv', './data/fine_tuning_dataset')
+    create_training_dataset('./data/cot.csv', './data', './prompts/templates/cot.txt', 'cot_fine_tuning')
+    # main('./data/fine_tuning_subset.csv', './data/fine_tuning_dataset')
