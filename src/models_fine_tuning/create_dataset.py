@@ -28,11 +28,8 @@ def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: s
 
 # Template for fine-tuning
 chat_template = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-
 {SYSTEM}<|eot_id|><|start_header_id|>user<|end_header_id|>
-
 {INPUT}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
 {OUTPUT}<|eot_id|>"""
 
 max_seq_length = 2048
