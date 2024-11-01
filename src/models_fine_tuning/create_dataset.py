@@ -1,7 +1,6 @@
 import pandas as pd
 import os 
-from convert_prompts import read_csv, sample_data, select_columns, save_to_csv, save_to_json, read_prompts_from_txt
-from typing import List, Dict
+from convert_prompts import read_csv, select_columns, save_to_csv, read_prompts_from_txt
 from datasets import load_dataset
 from unsloth import FastLanguageModel
 from datasets import DatasetDict
