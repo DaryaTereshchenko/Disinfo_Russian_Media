@@ -16,7 +16,7 @@ def create_training_dataset(file_path: str, output_csv_path: str, prompt_path: s
     user_prompts = []
     assistant_prompts = []
     for _, row in selected_df.iterrows():
-        text = row['text']
+        text = row['text'][:4000]  # Truncate text to 4000 characters
         label = row['class']
         system_prompts.append(system_prompt)
         user_prompts.append(user_prompt_template.format(text=text))
@@ -85,5 +85,5 @@ def main(path_to_csv: str, output_path: str):
 
 
 if __name__ == "__main__":
-    # create_training_dataset('./data/few_shot.csv', './data', './prompts/templates/few_shot.txt', 'fewshot_fine_tuning')
-    main('./data/fewshot_fine_tuning.csv', './data/fewshot_dataset')
+    # create_training_dataset('./data/cot.csv', './data', './prompts/templates/cot.txt', 'cot_fine_tuning_truncated')
+    main('./data/cot_fine_tuning_truncated.csv', './data/cot_truncated_dataset')
