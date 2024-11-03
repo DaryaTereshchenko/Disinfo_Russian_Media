@@ -57,7 +57,7 @@ ollama serve
 ```bash
 ollama pull llama3.1
 ollama pull gemma2
-ollama pull mistral-nemo
+ollama pull mistral-nemo:12b
 ```
 
 5. Run the ollama models:
