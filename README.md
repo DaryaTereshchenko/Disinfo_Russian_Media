@@ -41,7 +41,26 @@ The models can be re-run using the script in ```src/models_fine_tuning/test_fine
 git https://github.com/DaryaTereshchenko/Disinfo_Russian_Media
 cd Disinfo_Russian_Media
 ```
+
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+3. Install ollama via this [link](https://ollama.com/download/windows) for the inference task that is performed in ```src/prompts_testing.py```.
+- start the server by running the following command:
+```bash
+ollama serve
+```
+
+4. Download the necessary models in ollama:
+```bash
+ollama pull llama3.1
+ollama pull gemma2
+ollama pull mistral-nemo
+```
+
+5. Run the ollama models:
+```bash
+ollama run llama3.1
 ```
