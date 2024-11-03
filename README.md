@@ -20,7 +20,7 @@ The selected models include:
 The confusion matrices of prompts tested on the inference task can be found in ```cfm_base_models```. The confusion matrices of the fine-tuned models testing can be found in ```cfm_fine_tuned_models```.
 
 You can find the fine-tuned models in the following folder: ```fine_tuned_models```.
-The models can be re-run using the script in ```src/models_fine_tuning/test_fine_tuned.ipynb```
+The models can be re-run using the script in ```src/models_fine_tuning/test_fine_tuned.ipynb``` but you need to specify the path to the model and the dataset.
 
 ## Usage Tips 
 
